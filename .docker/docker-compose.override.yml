@@ -1,0 +1,118 @@
+version: '3.4'
+
+services:
+  # customer-portal-api-gateway:
+  #   restart: ${SERVICERESTARTBEHAVIOUR}
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_URLS=https://+:443;http://+:80
+  #     - ASPNETCORE_HTTPS_PORT=44357
+  #   ports:
+  #     - "20044:80"
+  #     - "44357:443"
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  authentication-service:
+    restart: ${SERVICERESTARTBEHAVIOUR}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_HTTPS_PORT=44358
+      - ConnectionStrings__DefaultConnection=Server=sql.data,1433;Database=OnboardingAuthDB;User Id=${SQLDATABASEUSER};Password=${SQLDATABASEPASSWORD};
+      - amqp__hostName=${AMQPHOST}
+      - amqp__exchange=test.exchange
+      - amqp__queueName=test.queue
+      - amqp__routingKey=test
+      - spring__application__name=authentication-service
+      - eureka__client__serviceUrl=${SERVICEREGISTRYURL}
+      - eureka__client__shouldFetchRegistry=${CLIENTSHOULDFETCHREGISTRY}
+      - eureka__client__shouldRegisterWithEureka=${CLIENTSHOULDREGISTERWITHEUREKA}
+      - eureka__instance__port=20045
+      - tokenManagement__secret=${TOKENSECRET}
+      - tokenManagement__issuer=${TOKENISSUER}
+      - tokenManagement__audience=${TOKENAUDIENCE}
+      - tokenManagement__accessExpiration=${TOKENACCESSEXPIRATION}
+      - tokenManagement__refreshExpiration=${TOKENREFRESHEXPIRATION}
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    build:
+      args: 
+        - CUSTOM_FEED_USERNAME=${PACKAGEFEEDUSER}
+        - CUSTOM_FEED_PERSONAL_ACCESS_TOKEN=${PACKAGEPERSONALACCESSTOEKN}
+    ports:
+      - "20045:80"
+      # - "44358:443"
+
+  csv-service:
+    restart: ${SERVICERESTARTBEHAVIOUR}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_HTTPS_PORT=44360
+      - amqp__hostName=${AMQPHOST}
+      - amqp__exchange=test.exchange
+      - amqp__queueName=test.queue
+      - amqp__routingKey=test
+      - spring__application__name=csv-service
+      - eureka__client__serviceUrl=${SERVICEREGISTRYURL}
+      - eureka__client__shouldFetchRegistry=${CLIENTSHOULDFETCHREGISTRY}
+      - eureka__client__shouldRegisterWithEureka=${CLIENTSHOULDREGISTERWITHEUREKA}
+      - eureka__instance__port=20047
+      - tokenManagement__secret=${TOKENSECRET}
+      - tokenManagement__issuer=${TOKENISSUER}
+      - tokenManagement__audience=${TOKENAUDIENCE}
+      - tokenManagement__accessExpiration=${TOKENACCESSEXPIRATION}
+      - tokenManagement__refreshExpiration=${TOKENREFRESHEXPIRATION}
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    build:
+      args: 
+        - CUSTOM_FEED_USERNAME=${PACKAGEFEEDUSER}
+        - CUSTOM_FEED_PERSONAL_ACCESS_TOKEN=${PACKAGEPERSONALACCESSTOEKN}
+    ports:
+      - "20046:80"
+      # - "44360:443"
+
+  shopping-cart-service:
+    restart: ${SERVICERESTARTBEHAVIOUR}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_HTTPS_PORT=44365
+      - ConnectionStrings__DefaultConnection=Server=sql.data,1433;Database=ShoppingCartMSDb;User Id=${SQLDATABASEUSER};Password=${SQLDATABASEPASSWORD};
+      - spring__application__name=shopping-cart-service
+      - eureka__client__serviceUrl=${SERVICEREGISTRYURL}
+      - eureka__client__shouldFetchRegistry=${CLIENTSHOULDFETCHREGISTRY}
+      - eureka__client__shouldRegisterWithEureka=${CLIENTSHOULDREGISTERWITHEUREKA}
+      - eureka__instance__port=20052
+      - tokenManagement__secret=${TOKENSECRET}
+      - tokenManagement__issuer=${TOKENISSUER}
+      - tokenManagement__audience=${TOKENAUDIENCE}
+      - tokenManagement__accessExpiration=${TOKENACCESSEXPIRATION}
+      - tokenManagement__refreshExpiration=${TOKENREFRESHEXPIRATION}      
+      - amqp__hostName=${AMQPHOST}
+      - amqp__exchange=test.exchange
+      - amqp__queueName=test.queue
+      - amqp__routingKey=test
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    build:
+      args: 
+        - CUSTOM_FEED_USERNAME=${PACKAGEFEEDUSER}
+        - CUSTOM_FEED_PERSONAL_ACCESS_TOKEN=${PACKAGEPERSONALACCESSTOEKN}
+    ports:
+      - "20047:80"
+      # - "44365:443"
+  
+  sql.data:
+    build: 
+      args: 
+      - PASSWORD=${SQLDATABASEPASSWORD}

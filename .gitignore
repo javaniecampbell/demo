@@ -3,3 +3,7 @@
 # **/services/csv-service
 # **/services/Services.Common
 # **/services/shopping-cart-service
+**/.env
+**/.env.dev
+**/.env.stable
+**/.env.prod

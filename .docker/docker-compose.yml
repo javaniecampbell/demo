@@ -1,0 +1,167 @@
+version: '3.4'
+
+services:
+# Microservices
+  authentication-service:
+    image: ${DOCKER_REGISTRY-}authenticationservice
+    build: 
+      context: ../services/authentication-service
+    networks:
+      - onboarding
+    depends_on: 
+      - sql.data
+      # - service-registry
+    # entrypoint: "./wait-for-it.sh sql.data:1433 -- dotnet authentication-service.dll"
+  
+
+  csv-service:
+    image: ${DOCKER_REGISTRY-}csvservice
+    build: 
+      context: ../services/csv-service
+    networks:
+      - onboarding
+    depends_on: 
+      - authentication-service
+      # - service-registry
+
+
+  shopping-cart-service:
+    image: ${DOCKER_REGISTRY-}shoppingcartservice
+    build: 
+      context: ../services/shopping-cart-service
+    networks:
+      - onboarding
+    depends_on:
+      - authentication-service
+      # - service-registry
+
+
+# Infrastructure & Databases
+  sql.data:
+    image: ${DOCKER_REGISTRY-}sqlserverservice
+    build: ../.infrastructure/sql.data
+    ports:
+      - "1433:1433"
+    networks: 
+      - onboarding
+
+  mongo.data:
+    image: mongo
+    hostname: mongo.data
+    ports:
+      - "27017:27017"
+    networks:
+      - onboarding
+
+
+    
+# Networks
+networks:
+  onboarding:
+    driver: bridge
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Infrastructure & Databases
+
+  # sql.data:
+  #   image: microsoft/mssql-server-linux
+  #   environment: 
+  #     - SA_PASSWORD=P@ssw0rd1
+  #     - ACCEPT_EULA=Y
+  #   ports:
+  #     - "1433:1433"
+  #   networks: 
+  #     - onboarding
+
+  # service.bus:
+  #   build: ../.infrastructure/service-bus
+  #   hostname: service.bus
+  #   ports:
+  #     - "15672:15672"
+  #     - "5672:5672"
+  #   networks:
+  #     - onboarding
+
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:15672"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 8
+  
+  # service-registry:
+  #   image: ${DOCKER_REGISTRY-}serviceregistry
+  #   build: ../service-registry
+  #   ports:
+  #     - "8761:8761"
+  #   networks: 
+  #     - onboarding
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8761"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 8
+
+
+# Frontend & BFF
+  # api-gateway:
+  #   image: ${DOCKER_REGISTRY-}customerportalapigateway
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   networks:
+  #     - onboarding
+  #   depends_on:
+  #     - customers-service
+  #     - csv-service
+  #     - authentication-service
+  #     - face-ai-service
+  #     - ocr-ai-service
+  #     - service.bus
+  #     - service.registry
+  #     - shopping-cart-service
+
+  # frontend:
+  #   restart: ${SERVICERESTARTBEHAVIOUR}
+  #   image: ${DOCKER_REGISTRY-}onboardingprototype
+  #   build: ../onboarding-prototype
+  #   env_file: ../onboarding-prototype/.env
+  #   networks:
+  #     - onboarding
+  #   ports: 
+  #     - "4000:3000"
+  #   # depends_on: 
+  #   #   - api-gateway
+  
+
+# Microservices
+
+  # notifications-service:
+  #   image: ${DOCKER_REGISTRY-}notifications-service
+  #   build:
+  #     context: ../notifications-service
+  #   networks:
+  #     - onboarding
+  #   depends_on:
+  #     - authentication-service
+  #     - service-registry
+  

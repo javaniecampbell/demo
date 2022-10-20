@@ -7,7 +7,7 @@
 
 $currentPath = Split-Path -Parent $MyInvocation.MyCommand.Definition 
 
-$folders = @(".docker", ".infrastructure", ".k8s", ".scripts", ".tools")
+$folders = @(".docker", ".infrastructure", ".k8s", ".scripts", ".tools",".services")
 Write-Host "Creating directories.."
 foreach ($folder in $folders) {
     # Write-Host "Creating directories at [$folder]..."
